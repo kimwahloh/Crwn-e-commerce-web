@@ -23,9 +23,6 @@ const SignUpForm = () => {
     const [formFields, setFormFields] = useState(defaultFormFields);
     const {displayName, email, password, confirmPassword} = formFields;
 
-    console.log(formFields);
-
-
     //100 reset the form to empty after submit
     const resetFormFields = () => {
         setFormFields(defaultFormFields);
@@ -43,6 +40,7 @@ const SignUpForm = () => {
 
         //refer 99 & 100 
         //100 reset function called after we successfully created the user doc from the auth
+        //108 call： whenever a user signs up for the first time, there will also have their user set inside of our user context
         try {
             const {user} = await createAuthUserWithEmailAndPassword(email, password);
 

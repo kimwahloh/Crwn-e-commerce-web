@@ -6,7 +6,9 @@ import {
     signInWithPopup, 
     GoogleAuthProvider, 
     createUserWithEmailAndPassword,
-    signInWithEmailAndPassword 
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged
 } from 'firebase/auth';
 
 import { 
@@ -56,8 +58,6 @@ export const createUserDocumentFromAuth = async (
 
     //95 but 1st need to check if there is any existing document reference in our database
     const userSnapshot = await getDoc(userDocRef);
-    console.log(userSnapshot);
-    console.log(userSnapshot.exists());
 
 //96 if the user is not existed, create their info with the date and set the database
 if(!userSnapshot.exists()) {
@@ -97,3 +97,13 @@ export const signInAuthUserWithEmailAndPassword = async (email, password) => {
 
     return await signInWithEmailAndPassword(auth, email, password);
 };
+
+//108 NOTE that auth is also keeping track of what users are signed in right now
+export const signOutUser = async () => await signOut(auth);
+
+//110 1st auth, 2nd some callback that you want to call everytime the auth state changes
+//110 whenever you instantiate this function, will have to give a callback, which is going to give to onAuthStateChanged
+//110 so this function will call this callback whenever the authentication state of our 'auth' singleton changes
+//110 e.g. auth changes such aa user sign-in OR sign-out
+//110 BUT need to stop it from listening whenever this component unmounts!
+export const onAuthStateChangedListener = (callback) => onAuthStateChanged(auth, callback);

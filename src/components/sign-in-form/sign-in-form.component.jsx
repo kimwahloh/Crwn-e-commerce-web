@@ -4,6 +4,7 @@ import {useState} from "react";
 import FormInput from "../form-input/form-input.component";
 import Button from "../button/button.component";
 
+
 import { 
     signInWithGooglePopup, 
     createUserDocumentFromAuth,
@@ -21,6 +22,8 @@ const defaultFormFields = {
 //98 所以defaultFormFields的value就是原本的formFields；空的
 //98 formFields is now an object
 //98 那4个value 变constants inside the component
+//the current user is being managed through a context in React, and the setCurrentUser function (or state setter) is being used 
+//to update the user information within a specific component.
 const SignInForm = () => {
     const [formFields, setFormFields] = useState(defaultFormFields);
     const {email, password} = formFields;
@@ -33,8 +36,7 @@ const SignInForm = () => {
 
     //103 Sign In Form using Google to sign in
     const signInWithGoogle = async () => {
-        const {user} = await signInWithGooglePopup();
-        await createUserDocumentFromAuth (user);
+        await signInWithGooglePopup();
     };
 
     //99 all of what's goin' to the form we r goin' to handle; no default behaviour of the form
@@ -42,10 +44,10 @@ const SignInForm = () => {
         event.preventDefault();
 
 
-    
+        //106 run 'setCurrentUser' whenever the user value comes back
+        //106 then access it inside of my navigation component
         try {
-            const response = await signInAuthUserWithEmailAndPassword (email, password);
-            console.log(response)
+            await signInAuthUserWithEmailAndPassword (email, password);
             resetFormFields();
 
         }   catch(error) {
