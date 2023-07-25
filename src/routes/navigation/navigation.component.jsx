@@ -12,7 +12,7 @@ import { CartContext } from "../../contexts/cart.context";
 //108
 import { signOutUser } from "../../utils/firebase/firebase.utils";
 
-import './navigation.styles.scss';
+import { NavigationContainer, LogoContainer, NavLinks, NavLink } from './navigation.styles';
 
 
 //106 useContext as a hook tells the component whenever a value inside of the context updates, re-render it
@@ -24,27 +24,27 @@ const Navigation = () => {
     //108 when there is a current user （就是说user log in了）link 要变sign out
     return (
       <Fragment>
-        <div className="navigation">
-            <Link className="logo-container" to='/'>
+        <NavigationContainer>
+            <LogoContainer to='/'>
                 <CrwnLogo className="Logo"/>
-            </Link>
-            <div className="nav-links-container">
-                <Link className="nav-link" to='/shop'>
+            </LogoContainer>
+            <NavLinks>
+                <NavLink to='/shop'>
                     SHOP
-                </Link>
+                </NavLink>
                 {currentUser ? (
-                    <span className="nav-link" onClick={signOutUser}>
+                    <NavLink as='span' onClick={signOutUser}>
                     SIGN OUT
-                    </span>
+                    </NavLink>
                 ) : (
-                <Link className="nav-link" to='/auth'>
+                <NavLink to='/auth'>
                     SIGN IN
-                </Link>
+                </NavLink>
                 )}
                 <CartIcon />
-            </div>
+            </NavLinks>
             {isCartOpen && <CartDropdown />}
-        </div>
+        </NavigationContainer>
         <Outlet />
       </Fragment>
     );

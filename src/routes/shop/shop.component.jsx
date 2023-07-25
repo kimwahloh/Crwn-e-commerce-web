@@ -1,20 +1,19 @@
-import { useContext } from "react";
+//134 
+import { Routes, Route } from 'react-router-dom';
 
-import { ProductsContext } from "../../contexts/products.context";
-import ProductCard from "../../components/product-card/product-card.component";
+import CategoriesPreview from '../categories-preview/categories-preview.component';
+import Category from '../category/category.component';
 
 import './shop.styles.scss';
 
 //114 Any updates to the products value within the ProductsContext will cause the component to re-render, ensuring it stays up to date with the latest value from the context.
 const Shop = () => {
-    const {products} = useContext(ProductsContext);
-
+    
     return (
-        <div className="products-container">
-            {products.map((product) => (
-                <ProductCard key={product.id} product={product} /> 
-            ))}
-        </div>
+        <Routes>
+            <Route index element={<CategoriesPreview />} />
+            <Route path=':category' element={<Category />} />
+        </Routes>
     );
 };
 

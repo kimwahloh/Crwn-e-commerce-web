@@ -12,37 +12,84 @@ import {
 } from 'firebase/auth';
 
 import { 
-    getFirestore, doc, getDoc, setDoc 
+    getFirestore, 
+    doc, 
+    getDoc, 
+    setDoc, 
+    collection, 
+    writeBatch,
+    query,
+    getDocs 
 } from 'firebase/firestore';
 
-// Your web app's Firebase configuration
+// 93 Your web app's Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyBU1i6Q5saAdMxeFWdVxAikiUx5pGVLLkQ",
     authDomain: "crwn-clothing-db-a3ca7.firebaseapp.com",
     projectId: "crwn-clothing-db-a3ca7",
     storageBucket: "crwn-clothing-db-a3ca7.appspot.com",
     messagingSenderId: "718950178811",
-    appId: "1:718950178811:web:67b53b2886397e44fe755e"
+    appId: "1:718950178811:web:e30fd2ca5c4fa6d1fe755e"
   };
   
 // Initialize Firebase
 const firebaseApp = initializeApp(firebaseConfig);
 
-const provider = new GoogleAuthProvider();
+const googleProvider = new GoogleAuthProvider();
 
 //94 evertime when someone interacts with our provider, we want to force them to select an acc
-provider.setCustomParameters({
-    prompt: "select_account"
+googleProvider.setCustomParameters({
+    prompt: "select_account",
 });
 
 //94 create the instance
 //94 single line only- bcz rules for authentication that communicate with Firebase is always the same for every app
-export const auth = getAuth()
+export const auth = getAuth();
 //94 BUT for provider can be vary
-export const signInWithGooglePopup = () => signInWithPopup(auth, provider);
+export const signInWithGooglePopup = () => signInWithPopup(auth, googleProvider);
+
+export const signInWithGoogleRedirect = () => signInWithRedirect(auth, googleProvider);
 
 //95 Instantiated fire store and use it to access our database
-export const db = getFirestore()
+export const db = getFirestore();
+
+//128 addCollectionAndDocuments-Firebase DB No-SQL
+//128 bcz we're adding to an external source, going to be 'async' as we calling up onto an API to store data
+//129 it allows to attach a bunch of different writes, deletes, sets to the batch and only when we’re ready to fire off the batch does the actual transaction begin
+export const addCollectionAndDocuments = async (collectionKey, objectsToAdd) => {
+    const batch = writeBatch(db);
+    const collectionRef = collection(db, collectionKey);
+
+    //129 passing collectionRef from calling collection, where the DB already passed
+    //129 Iterate it over each individual object in the object; added an additional batch set call to create a new document reference for each of those objects (where the key is the title) and the value is the object itself
+    objectsToAdd.forEach((object) => {
+        const docRef = doc(collectionRef, object.title.toLowerCase());
+        batch.set(docRef, object);
+    });
+
+    //129 it allows to attach a bunch of different writes, deletes, sets to the batch and only when we’re ready to fire off the batch does the actual transaction begin
+    await batch.commit();
+    console.log('done');
+};
+
+//130 sets up a reference to the Firestore collection "categories" and creates a query object based on that collection reference
+export const getCategoriesAndDocuments = async () => {
+    const collectionRef = collection(db, 'categories');
+    const q = query(collectionRef);
+
+    //130 asynchronous ability to fetch those document snapshots that we want
+    //130 reducing over the array in order to end up with an object
+    //the provided code executes a Firestore query to fetch documents from the "categories" collection, processes the retrieved data, and returns a JavaScript object (categoryMap) 
+    //that maps category titles (in lowercase) to their corresponding items from the Firestore database
+    const querySnapshot = await getDocs(q);
+    const categoryMap = querySnapshot.docs.reduce((acc, docSnapshot) => {
+        const { title, items } = docSnapshot.data();
+        acc[title.toLowerCase()] = items;
+        return acc;
+    }, {});
+
+    return categoryMap;
+};
 
 //95 an async function that receives some user authentication object that getting back from Firebase authentication, our Google assignment
 //95 take the data getting from authentication service and store inside Fire Store
@@ -54,7 +101,6 @@ export const createUserDocumentFromAuth = async (
     if(!userAuth) return;
 
     const userDocRef = doc(db, 'users', userAuth.uid);
-
 
     //95 but 1st need to check if there is any existing document reference in our database
     const userSnapshot = await getDoc(userDocRef);
