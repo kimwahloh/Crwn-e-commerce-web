@@ -82,13 +82,7 @@ export const getCategoriesAndDocuments = async () => {
     //the provided code executes a Firestore query to fetch documents from the "categories" collection, processes the retrieved data, and returns a JavaScript object (categoryMap) 
     //that maps category titles (in lowercase) to their corresponding items from the Firestore database
     const querySnapshot = await getDocs(q);
-    const categoryMap = querySnapshot.docs.reduce((acc, docSnapshot) => {
-        const { title, items } = docSnapshot.data();
-        acc[title.toLowerCase()] = items;
-        return acc;
-    }, {});
-
-    return categoryMap;
+    return querySnapshot.docs.map((docSnapshot) => docSnapshot.data());
 };
 
 //95 an async function that receives some user authentication object that getting back from Firebase authentication, our Google assignment
