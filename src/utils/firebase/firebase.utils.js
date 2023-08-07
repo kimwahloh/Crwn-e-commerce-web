@@ -147,3 +147,18 @@ export const signOutUser = async () => await signOut(auth);
 //110 e.g. auth changes such aa user sign-in OR sign-out
 //110 BUT need to stop it from listening whenever this component unmounts!
 export const onAuthStateChangedListener = (callback) => onAuthStateChanged(auth, callback);
+
+//177 Unsubscribe the moment we get a value; resolve with the userAuth
+//177 to ensure the listener will not always be active inside of our file; which will caused memory-leak
+export const getCurrentUser = () => {
+    return new Promise((resolve, reject) => {
+        const unsubscribe = onAuthStateChanged(
+            auth,
+            (userAuth) => {
+                unsubscribe();
+                resolve(userAuth);
+            },
+            reject
+        );
+    });
+};

@@ -1,4 +1,5 @@
 import {useState} from "react";
+import { useDispatch } from "react-redux";
 
 //101 
 import FormInput from "../form-input/form-input.component";
@@ -7,6 +8,7 @@ import Button from "../button/button.component";
 import { createAuthUserWithEmailAndPassword, createUserDocumentFromAuth } from "../../utils/firebase/firebase.utils";
 
 import { SignUpContainer } from './sign-up-form.styles';
+import { signUpStart } from "../../store/user/user.action";
 
 //98 initialise value for these 4 values; empty strings
 const defaultFormFields = {
@@ -22,6 +24,7 @@ const defaultFormFields = {
 const SignUpForm = () => {
     const [formFields, setFormFields] = useState(defaultFormFields);
     const {displayName, email, password, confirmPassword} = formFields;
+    const dispatch = useDispatch();
 
     //100 reset the form to empty after submit
     const resetFormFields = () => {
@@ -42,9 +45,7 @@ const SignUpForm = () => {
         //100 reset function called after we successfully created the user doc from the auth
         //108 call： whenever a user signs up for the first time, there will also have their user set inside of our user context
         try {
-            const {user} = await createAuthUserWithEmailAndPassword(email, password);
-
-            await createUserDocumentFromAuth(user, {displayName});
+            dispatch(signUpStart(email, password, displayName));
             resetFormFields();
 
         } catch(error) {

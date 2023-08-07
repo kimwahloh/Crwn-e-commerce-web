@@ -1,16 +1,15 @@
 import { Fragment } from "react";
-import {Outlet} from "react-router-dom";
-import { useSelector } from "react-redux";
+import { Outlet} from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 
 import CartIcon from "../../components/cart-icon/cart-icon.component";
 import CartDropdown from "../../components/cart-dropdown/cart-dropdown.component";
 
 import { selectIsCartOpen } from "../../store/cart/cart.selector";
 import { selectCurrentUser } from "../../store/user/user.selector";
+import { signOutStart } from "../../store/user/user.action";
 
 import { ReactComponent as CrwnLogo } from '../../assets/crown.svg';
-//108
-import { signOutUser } from "../../utils/firebase/firebase.utils";
 
 import { NavigationContainer, LogoContainer, NavLinks, NavLink } from './navigation.styles';
 
@@ -18,9 +17,12 @@ import { NavigationContainer, LogoContainer, NavLinks, NavLink } from './navigat
 //106 useContext as a hook tells the component whenever a value inside of the context updates, re-render it
 //106 re-render bcz the value inside of the UserContext has updated
 const Navigation = () => {
+    const dispatch = useDispatch();
     const currentUser = useSelector(selectCurrentUser);
     const isCartOpen = useSelector(selectIsCartOpen);
     
+    const signOutUser = () => dispatch(signOutStart());
+
     //108 when there is a current user （就是说user log in了）link 要变sign out
     return (
       <Fragment>

@@ -1,17 +1,14 @@
 import {useState} from "react";
-
+import { useDispatch } from "react-redux";
 //101 
 import FormInput from "../form-input/form-input.component";
 import Button, { BUTTON_TYPE_CLASSES } from "../button/button.component";
 
-
-import { 
-    signInWithGooglePopup, 
-    createUserDocumentFromAuth,
-    signInAuthUserWithEmailAndPassword
- } from "../../utils/firebase/firebase.utils";
+import { signInAuthUserWithEmailAndPassword } from "../../utils/firebase/firebase.utils";
 
 import { SignUpContainer, ButtonsContainer } from './sign-in-form.styles';
+import { googleSignInStart, emailSignInStart } from "../../store/user/user.action";
+
 
 //98 initialise value for these 4 values; empty strings
 const defaultFormFields = {
@@ -25,6 +22,7 @@ const defaultFormFields = {
 //the current user is being managed through a context in React, and the setCurrentUser function (or state setter) is being used 
 //to update the user information within a specific component.
 const SignInForm = () => {
+    const dispatch = useDispatch();
     const [formFields, setFormFields] = useState(defaultFormFields);
     const {email, password} = formFields;
 
@@ -36,7 +34,7 @@ const SignInForm = () => {
 
     //103 Sign In Form using Google to sign in
     const signInWithGoogle = async () => {
-        await signInWithGooglePopup();
+        dispatch(googleSignInStart());
     };
 
     //99 all of what's goin' to the form we r goin' to handle; no default behaviour of the form
@@ -47,9 +45,8 @@ const SignInForm = () => {
         //106 run 'setCurrentUser' whenever the user value comes back
         //106 then access it inside of my navigation component
         try {
-            await signInAuthUserWithEmailAndPassword (email, password);
+            dispatch(emailSignInStart(email, password));
             resetFormFields();
-
         }   catch(error) {
             switch(error.code) {
                 case 'auth/wrong-password':
